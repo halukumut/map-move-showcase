@@ -49,7 +49,10 @@ const QuoteForm = () => {
     // console.log("JSON to send:", JSON.stringify(data));
 
     try {
-      const res = await fetch("/api/sendMail", {
+      const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+      const sendUrl = API_BASE ? `${API_BASE}/api/sendMail` : "/api/sendMail";
+
+      const res = await fetch(sendUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

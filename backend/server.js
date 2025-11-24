@@ -11,8 +11,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({ origin: "http://localhost:8080", credentials: true }));
-app.use(bodyParser.json({ limit: "1mb" }));
+
+app.use(cors({
+  origin: ["http://localhost:5173", process.env.FRONTEND_URL]
+}));
 
 // Mail endpoint
 app.post("/api/sendMail", async (req, res) => {
