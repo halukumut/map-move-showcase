@@ -287,7 +287,7 @@ const MapPicker: React.FC<Props> = ({ open, onOpenChange, initial, onConfirm }) 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); runGeocode(searchQuery); } }}
-                    className="w-full rounded-md border px-3 py-2 bg-white/90"
+                    className="w-full rounded-md border px-3 py-2 bg-white/90 text-black"
                     placeholder="Adres veya semt ara (örn: Kağıthane)"
                   />
                   <Button type="button" onClick={() => runGeocode(searchQuery)}>Ara</Button>
@@ -295,7 +295,7 @@ const MapPicker: React.FC<Props> = ({ open, onOpenChange, initial, onConfirm }) 
                   {predictions.length > 0 && (
                     <div className="mt-2 max-h-56 overflow-auto bg-white/95 rounded-md shadow-md border">
                       {predictions.map((p) => (
-                        <button key={p.place_id || p.description} type="button" onClick={() => handlePickPrediction(p)} className="w-full text-left px-3 py-2 hover:bg-slate-50">
+                        <button key={p.place_id || p.description} type="button" onClick={() => handlePickPrediction(p)} className="w-full text-left px-3 py-2 hover:bg-slate-50 text-black">
                           {p.description}
                         </button>
                       ))}
