@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { MapPin, Home, Briefcase, Truck, Package } from "lucide-react";
+import MapPicker from "@/components/MapPicker";
 
 type ServiceType = "ev-tasima" | "profil-tasima" | "arac-kiralama" | "lojistik" | null;
 
@@ -21,33 +22,84 @@ const QuoteForm = () => {
     phone: "",
     pickupAddress: "",
     deliveryAddress: "",
+    pickupLat: undefined,
+    pickupLng: undefined,
     pickupFloor: "",
     deliveryFloor: "",
     pickupElevator: "",
     deliveryElevator: "",
+    deliveryLat: undefined,
+    deliveryLng: undefined,
     profileType: "",
     profileQuantity: "",
     vehicleType: "",
     rentalDuration: "",
     notes: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { service: selectedService, ...formData });
-    toast.success("Teklifiniz alındı! En kısa sürede sizinle iletişime geçeceğiz.");
-    
-    // Reset form
+    setIsSubmitting(true);
+    const data = {
+      service: selectedService,
+      ...formData, // tüm formData alanlarını ekler
+    };
+
+    // console.log("JSON to send:", JSON.stringify(data));
+
+    try {
+      const res = await fetch("/api/sendMail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "omit",
+      });
+
+      console.log('JSON DATA IS SENT')
+      console.log({headers: {
+                    "Content-Type": "application/json"
+                }})
+      console.log({
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+
+      let result;
+      try {
+        result = await res.json();
+      } catch (err) {
+        console.error("JSON parse error:", err);
+        result = { success: false };
+      }
+
+      if (result.success) alert("Mesajınız gönderildi!");
+      else alert("Bir hata oluştu.");
+    } catch (err) {
+      console.error(err);
+      alert("Bir hata oluştu.");
+    }
+
+    setIsSubmitting(false);
+
+    // Form reset
     setFormData({
       name: "",
       email: "",
       phone: "",
       pickupAddress: "",
       deliveryAddress: "",
+      pickupLat: undefined,
+      pickupLng: undefined,
       pickupFloor: "",
       deliveryFloor: "",
       pickupElevator: "",
       deliveryElevator: "",
+      deliveryLat: undefined,
+      deliveryLng: undefined,
       profileType: "",
       profileQuantity: "",
       vehicleType: "",
@@ -56,6 +108,7 @@ const QuoteForm = () => {
     });
     setSelectedService(null);
   };
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -68,7 +121,14 @@ const QuoteForm = () => {
   useEffect(() => {
     const handleFocus = (e: FocusEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') {
+      // Only scroll elements that are inputs or textareas inside the form.
+      // Ignore submit buttons to avoid interfering with form submission clicks.
+      const isInForm = formRef.current?.contains(target);
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+      const isButton = target.tagName === 'BUTTON';
+      const isSubmitButton = isButton && (target as HTMLButtonElement).getAttribute('type') === 'submit';
+
+      if (isInForm && (isInput || (isButton && !isSubmitButton))) {
         setTimeout(() => {
           target.scrollIntoView({ 
             behavior: 'smooth', 
@@ -109,6 +169,34 @@ const QuoteForm = () => {
     }
   };
 
+  // Map picker state — separate pickers for pickup and delivery
+  const [pickupMapOpen, setPickupMapOpen] = useState(false);
+  const [deliveryMapOpen, setDeliveryMapOpen] = useState(false);
+  const [initialPickupPos, setInitialPickupPos] = useState<{ lat: number; lng: number } | undefined>(undefined);
+  const [initialDeliveryPos, setInitialDeliveryPos] = useState<{ lat: number; lng: number } | undefined>(undefined);
+
+  const handleOpenMap = (which: "pickup" | "delivery") => {
+    if (which === "pickup") {
+      if (formData.pickupLat && formData.pickupLng) setInitialPickupPos({ lat: formData.pickupLat, lng: formData.pickupLng });
+      else setInitialPickupPos(undefined);
+      setPickupMapOpen(true);
+    } else {
+      if (formData.deliveryLat && formData.deliveryLng) setInitialDeliveryPos({ lat: formData.deliveryLat, lng: formData.deliveryLng });
+      else setInitialDeliveryPos(undefined);
+      setDeliveryMapOpen(true);
+    }
+  };
+
+  const handleMapConfirmPickup = (payload: { lat: number; lng: number; address?: string }) => {
+    setFormData({ ...formData, pickupLat: payload.lat, pickupLng: payload.lng, pickupAddress: payload.address ?? formData.pickupAddress });
+    setPickupMapOpen(false);
+  };
+
+  const handleMapConfirmDelivery = (payload: { lat: number; lng: number; address?: string }) => {
+    setFormData({ ...formData, deliveryLat: payload.lat, deliveryLng: payload.lng, deliveryAddress: payload.address ?? formData.deliveryAddress });
+    setDeliveryMapOpen(false);
+  };
+
   const serviceOptions = [
     { value: "ev-tasima", label: "Ev Taşıma", icon: Home, description: "Ev eşyalarınızın güvenli taşınması" },
     { value: "profil-tasima", label: "Demir / Profil Taşıma", icon: Briefcase, description: "Profesyonel ekipman taşımacılığı" },
@@ -117,11 +205,12 @@ const QuoteForm = () => {
   ];
 
   return (
+    <>
     <section id="quote" className="py-16 md:py-24 bg-secondary/30">
       <div className="container mx-auto px-4 md:px-8">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-foreground">Ücretsiz Teklif Alın</h2>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 text-foreground">Ücretsiz Teklif Alın</h2>
+          <p className="text-sm sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Hizmet türünü seçin ve formu doldurun
           </p>
         </div>
@@ -134,7 +223,7 @@ const QuoteForm = () => {
               <CardDescription className="text-sm sm:text-base">Size en uygun hizmeti belirleyin</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 {serviceOptions.map((option) => {
                   const Icon = option.icon;
                   const isSelected = selectedService === option.value;
@@ -148,10 +237,10 @@ const QuoteForm = () => {
                     }`}
                     onClick={() => handleServiceChange(option.value as ServiceType)}
                   >
-                    <CardContent className="p-6 text-center space-y-3">
-                      <Icon className={`w-12 h-12 mx-auto transition-colors ${isSelected ? 'text-primary-foreground' : 'text-primary/70'}`} />
-                      <h3 className={`font-semibold text-lg transition-colors ${isSelected ? 'text-primary-foreground' : 'text-foreground'}`}>{option.label}</h3>
-                      <p className={`text-sm transition-colors ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>{option.description}</p>
+                    <CardContent className="p-4 md:p-6 text-center space-y-2 md:space-y-3">
+                      <Icon className={`w-8 h-8 md:w-12 md:h-12 mx-auto transition-colors ${isSelected ? 'text-primary-foreground' : 'text-primary/70'}`} />
+                      <h3 className={`font-semibold text-sm md:text-lg transition-colors ${isSelected ? 'text-primary-foreground' : 'text-foreground'}`}>{option.label}</h3>
+                      <p className={`text-xs md:text-sm transition-colors ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>{option.description}</p>
                     </CardContent>
                   </Card>
                   );
@@ -228,14 +317,17 @@ const QuoteForm = () => {
                         </h3>
                         <div className="space-y-2">
                           <Label htmlFor="pickupAddress">Taşınacak Adres *</Label>
-                          <Input
-                            id="pickupAddress"
-                            name="pickupAddress"
-                            value={formData.pickupAddress}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="Örnek Mahallesi, Sokak No:1, İlçe, İl"
-                          />
+                          <div className="flex gap-2">
+                            <Input
+                              id="pickupAddress"
+                              name="pickupAddress"
+                              value={formData.pickupAddress}
+                              onChange={handleInputChange}
+                              required
+                              placeholder="Örnek Mahallesi, Sokak No:1, İlçe, İl"
+                            />
+                            <Button type="button" variant="outline" onClick={() => handleOpenMap('pickup')}>Haritada Seç</Button>
+                          </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
@@ -277,14 +369,17 @@ const QuoteForm = () => {
                         </h3>
                         <div className="space-y-2">
                           <Label htmlFor="deliveryAddress">Taşınacak Adres *</Label>
-                          <Input
-                            id="deliveryAddress"
-                            name="deliveryAddress"
-                            value={formData.deliveryAddress}
-                            onChange={handleInputChange}
-                            required
-                            placeholder="Yeni Mahallesi, Cadde No:10, İlçe, İl"
-                          />
+                          <div className="flex gap-2">
+                            <Input
+                              id="deliveryAddress"
+                              name="deliveryAddress"
+                              value={formData.deliveryAddress}
+                              onChange={handleInputChange}
+                              required
+                              placeholder="Yeni Mahallesi, Cadde No:10, İlçe, İl"
+                            />
+                            <Button type="button" variant="outline" onClick={() => handleOpenMap('delivery')}>Haritada Seç</Button>
+                          </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
@@ -331,25 +426,31 @@ const QuoteForm = () => {
                         <div className="space-y-4">
                           <div className="space-y-2">
                             <Label htmlFor="pickupAddress">Başlangıç Adresi *</Label>
-                            <Input
-                              id="pickupAddress"
-                              name="pickupAddress"
-                              value={formData.pickupAddress}
-                              onChange={handleInputChange}
-                              required
-                              placeholder="Örnek Mahallesi, Sokak No:1, İlçe, İl"
-                            />
+                            <div className="flex gap-2">
+                              <Input
+                                id="pickupAddress"
+                                name="pickupAddress"
+                                value={formData.pickupAddress}
+                                onChange={handleInputChange}
+                                required
+                                placeholder="Örnek Mahallesi, Sokak No:1, İlçe, İl"
+                              />
+                              <Button type="button" variant="outline" onClick={() => handleOpenMap('pickup')}>Haritada Seç</Button>
+                            </div>
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="deliveryAddress">Hedef Adres *</Label>
-                            <Input
-                              id="deliveryAddress"
-                              name="deliveryAddress"
-                              value={formData.deliveryAddress}
-                              onChange={handleInputChange}
-                              required
-                              placeholder="Yeni Mahallesi, Cadde No:10, İlçe, İl"
-                            />
+                            <div className="flex gap-2">
+                              <Input
+                                id="deliveryAddress"
+                                name="deliveryAddress"
+                                value={formData.deliveryAddress}
+                                onChange={handleInputChange}
+                                required
+                                placeholder="Yeni Mahallesi, Cadde No:10, İlçe, İl"
+                              />
+                              <Button type="button" variant="outline" onClick={() => handleOpenMap('delivery')}>Haritada Seç</Button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -469,8 +570,31 @@ const QuoteForm = () => {
                     />
                   </div>
 
-                  <Button type="submit" variant="accent" size="lg" className="w-full">
-                    Teklif Talebini Gönder
+                  <Button
+                    type="submit"
+                    variant="accent"
+                    size="lg"
+                    className="w-full"
+                    disabled={isSubmitting}
+                    aria-busy={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-5 w-5 text-accent-foreground"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                        Gönderiliyor...
+                      </>
+                    ) : (
+                      'Teklif Talebini Gönder'
+                    )}
                   </Button>
                 </form>
               </CardContent>
@@ -480,6 +604,21 @@ const QuoteForm = () => {
         </div>
       </div>
     </section>
+    <>
+      <MapPicker
+        open={pickupMapOpen}
+        onOpenChange={(open) => setPickupMapOpen(open)}
+        initial={initialPickupPos}
+        onConfirm={handleMapConfirmPickup}
+      />
+      <MapPicker
+        open={deliveryMapOpen}
+        onOpenChange={(open) => setDeliveryMapOpen(open)}
+        initial={initialDeliveryPos}
+        onConfirm={handleMapConfirmDelivery}
+      />
+    </>
+    </>
   );
 };
 

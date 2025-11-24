@@ -7,15 +7,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl sm:text-2xl font-bold mb-4">Sancak Nakliyat</h3>
-            <p className="text-primary-foreground/80 mb-4 text-sm sm:text-base">
+            <h3 className="text-lg sm:text-2xl font-bold mb-4">Sancak Nakliyat</h3>
+            <p className="text-primary-foreground/80 mb-4 text-xs sm:text-base">
               Güvenilir ve profesyonel ev taşıma hizmetlerinde yanınızdayız.
             </p>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-base sm:text-lg font-semibold mb-4">İletişim</h4>
+            <h4 className="text-sm sm:text-lg font-semibold mb-4">İletişim</h4>
             <div className="space-y-3 text-sm sm:text-base">
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
@@ -34,8 +34,8 @@ const Footer = () => {
 
           {/* Business Hours */}
           <div>
-            <h4 className="text-base sm:text-lg font-semibold mb-4">Çalışma Saatleri</h4>
-            <div className="space-y-2 text-primary-foreground/80 text-sm sm:text-base">
+            <h4 className="text-sm sm:text-lg font-semibold mb-4">Çalışma Saatleri</h4>
+            <div className="space-y-2 text-primary-foreground/80 text-xs sm:text-base">
               <p>Pazartesi - Cuma: 08:00 - 18:00</p>
               <p>Cumartesi: 09:00 - 16:00</p>
               <p>Pazar: Kapalı</p>

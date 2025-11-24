@@ -61,6 +61,10 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --svg-color-primary: 0 0 7%;
+    --svg-color-secondary: 100 10 50%;
+
   }
 
   .dark {
@@ -99,6 +103,10 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 20%;
     --sidebar-ring: 214 84% 56%;
+
+    --svg-color-primary: 0 0% 100%;
+    --svg-color-secondary: 100 10 50%;
+
   }
 }
 
