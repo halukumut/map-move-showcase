@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
+// `lovable-tagger` removed from frontend config
 import svgr from "vite-plugin-svgr";
 import dotenv from "dotenv";
 
@@ -28,7 +28,6 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       svgr(),
-      isDev && componentTagger(),
     ].filter(Boolean),
     resolve: {
       alias: {

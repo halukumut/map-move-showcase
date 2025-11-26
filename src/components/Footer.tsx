@@ -19,15 +19,15 @@ const Footer = () => {
             <div className="space-y-3 text-sm sm:text-base">
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-primary-foreground/80">0555 123 45 67</span>
+                <span className="text-primary-foreground/80">0545 389 54 81</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-primary-foreground/80 break-all">info@hizlitasimacilik.com</span>
+                <span className="text-primary-foreground/80 break-all">info@sancaknakliye.com</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-primary-foreground/80">Merkez Mah. Ticaret Cad. No:123, İstanbul</span>
+                <span className="text-primary-foreground/80">Merkez Mah. Havuzlar Cad. İstanbul/Kağıthane</span>
               </div>
             </div>
           </div>
@@ -36,9 +36,8 @@ const Footer = () => {
           <div>
             <h4 className="text-sm sm:text-lg font-semibold mb-4">Çalışma Saatleri</h4>
             <div className="space-y-2 text-primary-foreground/80 text-xs sm:text-base">
-              <p>Pazartesi - Cuma: 08:00 - 18:00</p>
-              <p>Cumartesi: 09:00 - 16:00</p>
-              <p>Pazar: Kapalı</p>
+              <p>Hafta içi: 08:00 - 21:00</p>
+              <p>Hafta sonu: 09:00 - 21:00</p>
             </div>
           </div>
         </div>
