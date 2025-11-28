@@ -9,11 +9,11 @@ const About = () => {
             
             <div className="space-y-4 md:space-y-6 text-muted-foreground px-2 md:px-8">
               <p className="text-sm md:text-lg leading-relaxed text-justify">
-                Taşımacılık sektöründe 30 yılı aşan bir deneyime sahibiz. Demir profil taşımacılığı ve ev/eşya taşıma alanlarında uzun yıllardır edindiğimiz bilgi birikimini, güvenlik ve planlama odaklı bir hizmet anlayışıyla birleştiriyoruz. Her taşıma sürecinde yükün niteliğine uygun bir çalışma düzeni kurar, süreci sorunsuz ve güvenilir şekilde tamamlamaya özen gösteririz.
+                Sancak Nakliyat olarak 35 yıldır nakliye ve lojistik sektöründe kesintisiz hizmet sunan köklü bir firmayız. Profil taşımacılığı, araç kiralama ve ev taşımacılığı alanlarında uzmanlaşmış ekibimizle, müşterilerimizin ihtiyaçlarına hızlı, güvenli ve çözüm odaklı yaklaşıyoruz. 7/24 hizmet anlayışımızla, istenilen ürünü istenilen saatte ulaştırmayı temel misyonumuz olarak benimsiyor; her teslimatta zamanında, özenli ve profesyonel bir deneyim sunmayı hedefliyoruz. Gücümüzü yılların tecrübesi ve müşteri memnuniyetinden alarak sektörde kalite standartlarını belirlemeye devam ediyoruz.
               </p>
-              <p className="text-sm md:text-lg leading-relaxed text-justify">
+              {/* <p className="text-sm md:text-lg leading-relaxed text-justify">
                 Tecrübemiz, disiplinimiz ve güvenilirliğimizle her işte istikrarlı bir hizmet sunmayı hedefliyoruz.
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
