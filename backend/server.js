@@ -31,7 +31,7 @@ app.post("/api/sendMail", async (req, res) => {
   try {
     const data = req.body;
 
-    if (!data.email || !data.name || !data.message) {
+    if (!data.email || !data.name) {
       return res.status(400).json({ error: "Eksik bilgi gönderildi." });
     }
 
