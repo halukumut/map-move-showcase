@@ -1,52 +1,57 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import stringifyObject, { stringiftObject } from './buffer.js'
+import { Resend } from "resend";
+import stringifyObject from "./buffer.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
+// Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware
+// CORS (çoklu domain destekli)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://sancaknakliye.com",
+  "https://www.sancaknakliye.com",
+];
 
-app.use(cors({
-  origin: ["http://localhost:5173", process.env.FRONTEND_URL]
-}));
+app.use(
+  cors({
+    origin: allowedOrigins,
+  })
+);
 
 // Mail endpoint
 app.post("/api/sendMail", async (req, res) => {
   try {
     const data = req.body;
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
-      },
-    });
+    if (!data.email || !data.name || !data.message) {
+      return res.status(400).json({ error: "Eksik bilgi gönderildi." });
+    }
 
-    await transporter.sendMail({
-      from: data.email,
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+      from: "Sancak Nakliye <onboarding@resend.dev>",
       to: process.env.TARGET_GMAIL_USER,
-      subject: `New message from ${data.name}`,
+      subject: `Yeni İletişim Mesajı: ${data.name}`,
       text: stringifyObject(data),
     });
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("MAIL ERROR:", err);
     res.status(500).json({ error: "Mail gönderilemedi" });
   }
 });
 
+// Server Start
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
 });
