@@ -45,6 +45,7 @@ app.post("/api/sendMail", async (req, res) => {
     });
 
     res.json({ success: true });
+    console.log("Mail gönderildi:", process.env.TARGET_GMAIL_USER);
   } catch (err) {
     console.error("MAIL ERROR:", err);
     res.status(500).json({ error: "Mail gönderilemedi" });
