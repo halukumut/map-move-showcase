@@ -38,7 +38,7 @@ app.post("/api/sendMail", async (req, res) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
-      from: "Sancak Nakliye <onboarding@resend.dev>",
+      from: "Sancak Nakliye <onboarding@sancaknakliye.com>",
       to: process.env.TARGET_GMAIL_USER,
       subject: `Yeni İletişim Mesajı: ${data.name}`,
       text: stringifyObject(data),
